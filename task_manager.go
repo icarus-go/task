@@ -1,8 +1,7 @@
-package instance
+package task
 
 import (
 	"fmt"
-	"pmo-test4.yz-intelligence.com/kit/task"
 	"sync"
 )
 
@@ -160,7 +159,7 @@ func (m *TaskManager) WaitSingle() {
 // Info 任务中心运行信息
 func (m *TaskManager) Info() map[string]interface{} {
 	info := make(map[string]interface{}, 2)
-	info["Version"] = task.VERSION
+	info["Version"] = VERSION
 
 	tasksLen := len(m.tasks)
 	items := make([]map[string]interface{}, tasksLen)

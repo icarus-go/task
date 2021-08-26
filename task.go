@@ -1,4 +1,4 @@
-package instance
+package task
 
 import (
 	"errors"
@@ -7,7 +7,7 @@ import (
 	"runtime"
 	"time"
 
-	"amiba.fun/amiba/go-component/tp"
+	"pmo-test4.yz-intelligence.com/base/utils/tp"
 )
 
 // Task 任务主体
