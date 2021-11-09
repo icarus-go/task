@@ -3,25 +3,24 @@ package task
 import (
 	"errors"
 	"fmt"
+	"pmo-test4.yz-intelligence.com/kit/data"
 	"pmo-test4.yz-intelligence.com/kit/task/constant"
 	"runtime"
 	"time"
-
-	"pmo-test4.yz-intelligence.com/base/utils/tp"
 )
 
 // Task 任务主体
 type Task struct {
-	Name      string      //任务名称
-	IsSingle  bool        //是否单例运行
-	StartTime tp.Datetime //小于等于当前时间马上执行
+	Name      string        //任务名称
+	IsSingle  bool          //是否单例运行
+	StartTime data.Datetime //小于等于当前时间马上执行
 
 	OnInterval func(t *Task) time.Duration //事件：必须，任务循环间隔时间
 	OnRun      func(t *Task)               //事件：必须，任务执行主体
 	OnPanic    func(t *Task, err error)    //事件：必须，发生异常时
 
-	lastRunTime tp.Datetime        //上一次执行时间
-	nextRunTime tp.Datetime        //下一次执行时间
+	lastRunTime data.Datetime      //上一次执行时间
+	nextRunTime data.Datetime      //下一次执行时间
 	runCount    int                //运行次数累计
 	panicCount  int                //异常次数
 	state       constant.TaskState //任务状态
@@ -56,9 +55,8 @@ func (t *Task) Init() error {
 		return errors.New("OnPanic事件没有设置")
 	}
 
-	var startTime tp.Datetime
-	if t.StartTime == startTime {
-		t.StartTime = tp.NewDatetime()
+	if t.StartTime.Unix() <= time.Now().Unix() {
+		t.StartTime.Time = time.Now()
 	}
 
 	t.isInit = true
@@ -88,7 +86,7 @@ func (t *Task) Start() error {
 		defer recoverTaskPanic(tt)
 
 		//指定时间启动
-		d := t.StartTime.Time().Unix() - time.Now().Unix()
+		d := t.StartTime.Time.Unix() - time.Now().Unix()
 		if d > 0 {
 			select {
 			case <-tt.stopChan:
@@ -107,10 +105,8 @@ func (t *Task) Start() error {
 
 			// 设置下次执行时间
 			i := tt.OnInterval(tt)
-			lt := time.Now()
-			nt := lt.Add(i)
-			tt.lastRunTime.SetTime(lt)
-			tt.nextRunTime.SetTime(nt)
+			tt.lastRunTime.Time = time.Now()
+			tt.nextRunTime.Time = tt.lastRunTime.Add(i)
 
 			if tt.state == constant.TASK_STATE_STOPPING {
 				<-tt.stopChan
@@ -157,12 +153,12 @@ func (t *Task) Data() map[string]interface{} {
 }
 
 // LastRunTime 上一次执行时间
-func (t *Task) LastRunTime() tp.Datetime {
+func (t *Task) LastRunTime() data.Datetime {
 	return t.lastRunTime
 }
 
 // NextRunTime 下一次执行时间
-func (t *Task) NextRunTime() tp.Datetime {
+func (t *Task) NextRunTime() data.Datetime {
 	return t.nextRunTime
 }
 

@@ -175,7 +175,6 @@ func (m *TaskManager) Info() map[string]interface{} {
 		item["RunCount"] = m.tasks[i].RunCount()
 		item["PanicCount"] = m.tasks[i].PanicCount()
 		item["State"] = m.tasks[i].State().String()
-
 		items[i] = item
 	}
 
