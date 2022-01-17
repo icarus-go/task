@@ -3,24 +3,24 @@ package task
 import (
 	"errors"
 	"fmt"
-	"pmo-test4.yz-intelligence.com/kit/data"
-	"pmo-test4.yz-intelligence.com/kit/task/constant"
+	"github.com/icarus-go/data/resource"
+	"github.com/icarus-go/task/constant"
 	"runtime"
 	"time"
 )
 
 // Task 任务主体
 type Task struct {
-	Name      string        //任务名称
-	IsSingle  bool          //是否单例运行
-	StartTime data.Datetime //小于等于当前时间马上执行
+	Name      string            //任务名称
+	IsSingle  bool              //是否单例运行
+	StartTime resource.Datetime //小于等于当前时间马上执行
 
 	OnInterval func(t *Task) time.Duration //事件：必须，任务循环间隔时间
 	OnRun      func(t *Task)               //事件：必须，任务执行主体
 	OnPanic    func(t *Task, err error)    //事件：必须，发生异常时
 
-	lastRunTime data.Datetime      //上一次执行时间
-	nextRunTime data.Datetime      //下一次执行时间
+	lastRunTime resource.Datetime  //上一次执行时间
+	nextRunTime resource.Datetime  //下一次执行时间
 	runCount    int                //运行次数累计
 	panicCount  int                //异常次数
 	state       constant.TaskState //任务状态
@@ -153,12 +153,12 @@ func (t *Task) Data() map[string]interface{} {
 }
 
 // LastRunTime 上一次执行时间
-func (t *Task) LastRunTime() data.Datetime {
+func (t *Task) LastRunTime() resource.Datetime {
 	return t.lastRunTime
 }
 
 // NextRunTime 下一次执行时间
-func (t *Task) NextRunTime() data.Datetime {
+func (t *Task) NextRunTime() resource.Datetime {
 	return t.nextRunTime
 }
 
